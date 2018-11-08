@@ -8,7 +8,7 @@ void filecopy(FILE *ifp, FILE *ofp)
 		putc(c, ofp); 
 }
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
 	// memory
 	int MEMORY_MAX = 30000;
