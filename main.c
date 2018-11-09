@@ -14,11 +14,15 @@ int main(int argc, char** argv)
 	int MEMORY_MAX = 30000;
 	int memory[MEMORY_MAX];
 	int *ptr = memory;
+	FILE* l_stack[MEMORY_MAX];
+	int ls_index = 0;
 	int c;
 
-	// initialize memory
-	for(int i=0; i<MEMORY_MAX; i++)
-		memory[i] = 0;
+	// initialize memory and bracket stack
+	for(int i=0; i<MEMORY_MAX; i++) {
+		memory[i]  = 0;
+		l_stack[i] = 0; 
+	}
 
 	printf("brainfuck\n");
 
@@ -40,7 +44,7 @@ int main(int argc, char** argv)
 		// parse the file to strip whitespace and bullshit
 		while ((c = getc(fp)) != EOF) {
 			if (c == '+' || c == '-' || c == '>' || c == '<' || 
-				c == '.' || c == ','|| c == '[' || c == ']')
+				c == '.' || c == ',' || c == '[' || c == ']')
 			{
 				putc(c, code);
 			}
@@ -57,27 +61,39 @@ int main(int argc, char** argv)
 				case '>': ++ptr; break;	
 				case '<': --ptr; break;
 				case '.': putchar(*ptr); break;
-				case '[':    
+				case '[':  
 					if (*ptr == 0) {
-						// jump to closing bracket
-						while( (c = fgetc(code)) != ']') {
-							if (c == EOF) {
-								printf("Error: expected a closing ] but reached EOF\n");
-								return 1; 
+						// jump to matching ] 
+						
+						
+						while ((c = fgetc(code)) != EOF) {
+							if (c == '[') { 
+
+								l_stack[ls_index++] = code;
+								
+							} else if (c == ']') {
+
+								if (ls_index == 0) {
+									fgetc(code);
+								} else {
+
+								}
+
 							}
 						}
-					} 
-					break;
-					
+
+
+					} else {
+						// push the current brackets file location on a stack and continue
+						l_stack[ls_index++] = code;
+					}
+					break;	
 				case ']':    
 					if (*ptr == 0) {
-						// jump to opening bracket
-						while ((c = fgetc(code)) != '[')
-						{	
-							fseek(code, -2, SEEK_CUR);
-						}
-					} 
-					break;
+						// pop from the left bracket stack and jump to that brackets position
+						FILE* file_pos = l_stack[ls_index--];
+						fseek(code, -2, SEEK_CUR);
+					} break;
 				default: 
 					break;
 			}
