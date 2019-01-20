@@ -60,6 +60,7 @@ int main(int argc, char** argv)
 			case '>': ++ptr; break;	
 			case '<': --ptr; break;
 			case '.': putchar(*ptr); break;
+			case ',': *ptr = getchar(); getchar(); break;
 			case '[':  
 				if (*ptr == 0) {
 					// jump to matching ] 
